@@ -27,9 +27,6 @@ jobs:
           node-version: '22'
           cache: npm
           cache-dependency-path: mobile-app/package-lock.json
-      # Refresh the Expo patch in the runner and show the exact lockfile delta for review.
-      - run: npm install expo@~55.0.32 --package-lock-only --ignore-scripts --no-audit --no-fund
-      - run: git diff -- package.json package-lock.json
       - run: npm ci
       - run: npm run check
       - name: Build web preview bundle (not production deployment)
