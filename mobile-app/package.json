@@ -11,7 +11,7 @@
     "check": "expo install --check"
   },
   "dependencies": {
-    "expo": "~55.0.0",
+    "expo": "~55.0.32",
     "expo-secure-store": "~55.0.0",
     "expo-status-bar": "~55.0.0",
     "react": "19.2.0",
