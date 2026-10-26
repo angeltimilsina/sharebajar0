@@ -14,7 +14,7 @@ const Button=({children,onPress,secondary=false,disabled=false})=>{
  const scale=React.useRef(new Animated.Value(1)).current;
  const reduced=React.useRef(false);
  useEffect(()=>{let active=true;AccessibilityInfo.isReduceMotionEnabled().then(value=>{if(active)reduced.current=value}).catch(()=>{});return()=>{active=false}},[]);
- function press(pressed){if(reduced.current)return;Animated.timing(scale,{toValue:pressed?.985:1,duration:pressed?85:170,easing:Easing.out(Easing.cubic),useNativeDriver:true}).start()}
+ function press(pressed){if(reduced.current)return;Animated.timing(scale,{toValue:pressed ? 0.985 : 1,duration:pressed?85:170,easing:Easing.out(Easing.cubic),useNativeDriver:true}).start()}
  return <Animated.View style={{transform:[{scale}]}}><Pressable accessibilityRole="button" accessibilityState={{disabled}} disabled={disabled} onPress={onPress} onPressIn={()=>press(true)} onPressOut={()=>press(false)} style={[s.button,secondary&&s.secondary,disabled&&{opacity:.5}]}><Text style={[s.buttonText,secondary&&{color:theme.ink}]}>{children}</Text></Pressable></Animated.View>;
 };
 const Card=({children})=><View style={s.card}>{children}</View>;
@@ -36,7 +36,7 @@ export default function App(){
  let body;
  if(PRIVATE.has(screen)&&!account?.signedIn)body=<Card><Heading>Make it your research workspace</Heading><Body>Sign in to save assets and access your account across web, iOS and Android.</Body><Field label="Email" value={email} onChangeText={setEmail} keyboardType="email-address" autoCapitalize="none" autoComplete="email"/><Field label="Password (12–128 characters)" value={password} onChangeText={setPassword} secureTextEntry autoComplete={signup?'new-password':'current-password'}/><Button disabled={busy} onPress={authenticate}>{signup?'Create account':'Sign in'}</Button><Button secondary onPress={()=>setSignup(!signup)}>{signup?'I already have an account':'Create a free account'}</Button></Card>;
  else if(PRIVATE.has(screen)&&!workspace)body=<Card><Body>Opening your account workspace…</Body></Card>;
- else if(screen==='onboarding')body=<><Text style={s.eyebrow}>ONE APP. AN ENTIRE FINANCIAL ECOSYSTEM.</Text><Text style={s.hero}>Finance that feels{'\\n'}effortless.</Text><Body>Explore markets, understand financial decisions, and organize your research in one beautifully connected experience.</Body><View style={s.featureStrip}>{['STOCKS','CRYPTO','GLOBAL MARKETS','AI RESEARCH'].map(x=><View key={x} style={s.featurePill}><Text style={s.featureText}>{x}</Text></View>)}</View><Card><Text style={s.cardEyebrow}>BAJAR RESEARCH BETA</Text><Heading>Explore before you trade.</Heading><Body>Discover markets, compare assets, and build a watchlist. This preview is for research and education; it does not place real-money orders. Forex execution and regulated services are planned, not live.</Body></Card><Button onPress={()=>navigate('choose-market')}>Start exploring  →</Button><Button secondary onPress={()=>navigate('home')}>Open market dashboard</Button></>;
+ else if(screen==='onboarding')body=<><Text style={s.eyebrow}>ONE APP. AN ENTIRE FINANCIAL ECOSYSTEM.</Text><Text style={s.hero}>Finance that feels{'\n'}effortless.</Text><Body>Explore markets, understand financial decisions, and organize your research in one beautifully connected experience.</Body><View style={s.featureStrip}>{['STOCKS','CRYPTO','GLOBAL MARKETS','AI RESEARCH'].map(x=><View key={x} style={s.featurePill}><Text style={s.featureText}>{x}</Text></View>)}</View><Card><Text style={s.cardEyebrow}>BAJAR RESEARCH BETA</Text><Heading>Explore before you trade.</Heading><Body>Discover markets, compare assets, and build a watchlist. This preview is for research and education; it does not place real-money orders. Forex execution and regulated services are planned, not live.</Body></Card><Button onPress={()=>navigate('choose-market')}>Start exploring  →</Button><Button secondary onPress={()=>navigate('home')}>Open market dashboard</Button></>;
  else if(screen==='choose-market')body=<><Body>Your location can suggest a market. You can change it anytime.</Body>{suggestion&&<Button secondary onPress={()=>choose(suggestion.marketCode)}>Suggested: {suggestion.countryName}</Button>}<Field label="Search markets" value={query} onChangeText={setQuery}/>{markets.filter(x=>(x.countryName+' '+x.marketCode).toLowerCase().includes(query.toLowerCase())).map(x=><Button secondary key={x.marketCode} onPress={()=>choose(x.marketCode)}>{x.flag} {x.countryName} · {x.currency}</Button>)}</>;
  else if(['home','rankings','search'].includes(screen))body=<>{screen==='search'&&<Field label="Search this market" value={query} onChangeText={setQuery} placeholder="Apple, Bitcoin, NABIL"/>}{screen!=='search'&&data&&<Card><Heading>{m?.countryName} market lens</Heading><Text style={s.metric}>{data.overview.valuationScore??'—'}<Text style={s.small}> /100 relative valuation</Text></Text><Body>{data.overview.summary}</Body></Card>}<ScrollView horizontal showsHorizontalScrollIndicator={false}>{['all','undervalued','fair','overvalued','dividend','growth'].map(v=><Pressable key={v} onPress={()=>setFilter(v)} style={[s.chip,filter===v&&{background:theme.soft,borderColor:theme.accent}]}><Text style={s.small}>{v}</Text></Pressable>)}</ScrollView><Card>{assetRows((data?.assets||[]).filter(a=>screen!=='search'||(a.name+' '+a.symbol).toLowerCase().includes(query.toLowerCase())))}</Card><Button secondary onPress={()=>Linking.openURL(API_URL+'/research')}>Explore public research pages →</Button></>;
  else if(screen==='asset-detail')body=asset?<><Card><Text style={s.small}>{asset.symbol} · {asset.exchange}</Text><Heading>{asset.name}</Heading><Text style={s.metric}>{cash(asset.price,asset.currency)}</Text><Body>{asset.valuationLabel}</Body><Body>{asset.valuationRationale}</Body><View style={s.metrics}>{[['P/E',asset.pe],['P/B',asset.pb],['Yield',asset.dividendYield],['Score',asset.valuationScore]].map(([k,v])=><View key={k} style={{width:'48%',padding:10}}><Text style={s.small}>{k}</Text><Text style={s.strong}>{v??'Not applicable'}</Text></View>)}</View><Body>{asset.valuationMethodology}</Body><Button onPress={()=>account?.signedIn?act({action:'watch_add',marketCode:asset.marketCode,symbol:asset.symbol}):navigate('watchlist')}>☆ Save to watchlist</Button><Button secondary onPress={()=>navigate('ai-chat')}>Research this asset ✦</Button></Card><Button secondary onPress={()=>Linking.openURL(API_URL+asset.assetUrl)}>Full asset research page →</Button></>:<Body>Choose an asset from rankings.</Body>;
@@ -60,18 +60,18 @@ const s=StyleSheet.create({
  content:{paddingHorizontal:20,paddingBottom:42,maxWidth:720,width:'100%',alignSelf:'center'},
  eyebrow:{fontSize:10,fontWeight:'900',letterSpacing:2.1,color:theme.accent,marginTop:24,marginBottom:8},
  hero:{fontSize:45,fontWeight:'800',lineHeight:51,color:theme.ink,letterSpacing:-2.2,marginTop:5,marginBottom:12},
- h2:{fontSize:21,fontWeight:'750',color:theme.ink,marginVertical:8,flexShrink:1,letterSpacing:-.5},
+ h2:{fontSize:21,fontWeight:'700',color:theme.ink,marginVertical:8,flexShrink:1,letterSpacing:-.5},
  body:{fontSize:14,lineHeight:23,color:theme.muted,marginVertical:8},
  small:{fontSize:11,lineHeight:18,color:theme.muted},
- strong:{fontSize:13,color:theme.ink,fontWeight:'650',lineHeight:21},
+ strong:{fontSize:13,color:theme.ink,fontWeight:'600',lineHeight:21},
  card:{borderWidth:1,borderColor:theme.line,borderRadius:theme.radius,padding:19,marginVertical:10,backgroundColor:'#fff',shadowColor:'#00342F',shadowOpacity:.045,shadowRadius:15,shadowOffset:{width:0,height:5},elevation:2},
  cardEyebrow:{color:theme.accent,fontSize:10,letterSpacing:1.4,fontWeight:'800'},
  button:{backgroundColor:theme.accent,borderRadius:14,paddingVertical:15,paddingHorizontal:14,marginVertical:7,alignItems:'center'},
  secondary:{backgroundColor:'#fff',borderWidth:1,borderColor:theme.line},
- buttonText:{fontSize:14,fontWeight:'750',color:'#082A29'},
+ buttonText:{fontSize:14,fontWeight:'700',color:'#082A29'},
  label:{fontSize:11,color:theme.muted,marginBottom:8},
  input:{padding:13,borderWidth:1,borderColor:theme.line,borderRadius:12,color:theme.ink,backgroundColor:'#fff',fontSize:14},
- metric:{fontSize:30,fontWeight:'750',color:theme.ink,marginVertical:12},
+ metric:{fontSize:30,fontWeight:'700',color:theme.ink,marginVertical:12},
  metrics:{flexDirection:'row',flexWrap:'wrap',gap:5},
  assetRow:{flexDirection:'row',gap:12,borderBottomWidth:1,borderColor:theme.line,paddingVertical:15},
  chip:{paddingHorizontal:13,paddingVertical:10,margin:4,borderWidth:1,borderColor:theme.line,borderRadius:12,backgroundColor:'#FFFFFF'},
@@ -83,6 +83,6 @@ const s=StyleSheet.create({
  tab:{paddingVertical:10,paddingHorizontal:13,borderRadius:13},
  tabActive:{backgroundColor:theme.soft},
  tabText:{fontSize:12,fontWeight:'600',color:theme.muted},
- tabTextActive:{color:theme.ink,fontWeight:'850'},
+ tabTextActive:{color:theme.ink,fontWeight:'800'},
  menu:{flexDirection:'row',flexWrap:'wrap',paddingHorizontal:12}
 });
